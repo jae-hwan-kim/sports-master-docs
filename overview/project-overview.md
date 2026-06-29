@@ -1,7 +1,7 @@
 # 프로젝트 개요
 
 **최초 작성**: 2026-06-22  
-**최종 수정**: 2026-06-22
+**최종 수정**: 2026-06-29
 
 ---
 
@@ -52,6 +52,8 @@ sports-master/
 | 환경변수 | @nestjs/config |
 | 로깅 | Winston + nest-winston |
 | 에러트래킹 | Sentry (@sentry/node) |
+| DB | PostgreSQL 16 (Docker) |
+| ORM | TypeORM |
 | 패키지매니저 | pnpm |
 
 ---
@@ -91,4 +93,4 @@ src/
 |------|-----|
 | 모바일 | https://github.com/jae-hwan-kim/sports-master-web |
 | API 서버 | https://github.com/jae-hwan-kim/sports-master-api |
-| 문서 | (추후 생성 예정) |
+| 문서 | https://github.com/jae-hwan-kim/sports-master-docs.git |
