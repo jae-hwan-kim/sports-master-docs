@@ -6,13 +6,20 @@
 
 | Method | Path | Auth | Summary |
 |--------|------|------|---------|
+| GET | /auth/check-nickname | N | 닉네임 사용 가능 확인 |
+| GET | /auth/check-email | N | 이메일 중복 확인 |
 | POST | /auth/register | N | 일반 회원가입 (이메일/비밀번호) |
 | POST | /auth/login | N | 일반 로그인 (이메일/비밀번호) |
 | POST | /auth/kakao | N | 카카오 OAuth 로그인/회원가입 |
+| GET | /auth/kakao/callback | N | 카카오 리다이렉트 중계 (앱 커스텀 스킴으로 재리다이렉트) |
 | POST | /auth/apple | N | 애플 OAuth 로그인/회원가입 (iOS 필수) |
+| POST | /auth/google | N | 구글 OAuth 로그인/회원가입 (idToken 검증) |
 | POST | /auth/refresh | N | Access Token 재발급 |
 | POST | /auth/logout | Y | 로그아웃 (refreshToken 무효화) |
 | DELETE | /auth/withdraw | Y | 회원탈퇴 |
+
+> 소셜 로그인 3종은 앱에서 받은 토큰을 서버가 검증하는 방식이다. 카카오만 code를 넘기고(서버가 토큰 교환), 애플/구글은 앱에서 얻은 idToken을 넘긴다.
+> 구글 idToken의 `aud`는 플랫폼별로 다르다 — iOS는 iOS 유형 클라이언트 ID(`GOOGLE_CLIENT_ID`), Android는 Web 유형 클라이언트 ID(`GOOGLE_WEB_CLIENT_ID`). 자세한 배경은 [ADR 005](../adr/005-android-google-native-signin.md).
 
 ---
 

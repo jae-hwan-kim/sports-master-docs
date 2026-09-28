@@ -34,6 +34,28 @@ pnpm install
    ```
    > VSCode 통합 터미널을 쓰고 있다면, `.zshrc` 수정 후 **새 터미널 탭을 열거나 VSCode를 재시작**해야 환경변수가 반영됩니다.
 4. Android Studio → **Tools → Device Manager**(또는 시작 화면 More Actions → Virtual Device Manager) → **Create Device**에서 에뮬레이터 생성 (예: Pixel 9, API 36.1 "Baklava")
+   > 에뮬레이터는 **Play Store가 포함된 이미지**로 만드세요. 구글 로그인이 Play services를 요구하므로, 없는 이미지에서는 로그인이 실패합니다.
+
+### 구글 로그인 (소셜 로그인 테스트가 필요할 때만)
+
+Google Cloud Console에서 클라이언트 3종이 필요합니다. 전환 배경은 [ADR 005](../adr/005-android-google-native-signin.md).
+
+| 유형 | 용도 | 앱에서 참조 |
+|------|------|------------|
+| iOS | iOS idToken의 `aud` | `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID` |
+| Web | Android idToken의 `aud` | `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` |
+| Android | Play services의 패키지명+SHA-1 검증 | 없음 (콘솔에만 등록) |
+
+1. **Web 유형 클라이언트 생성** — 리다이렉트 URI / 자바스크립트 원본은 비워둡니다(리다이렉트에 쓰지 않고 `aud` 값으로만 사용). 발급된 ID를 앱 `.env`의 `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID`와 API `.env`의 `GOOGLE_WEB_CLIENT_ID`에 **같은 값으로** 넣습니다.
+2. **Android 유형 클라이언트에 SHA-1 등록** — 로컬 debug 빌드의 지문을 확인해 등록합니다.
+   ```
+   keytool -list -v -keystore sports-master-web/android/app/debug.keystore      -storepass android -alias androiddebugkey | grep SHA1
+   ```
+   EAS 빌드용 지문은 `npx eas-cli credentials -p android`에서 확인합니다. Google은 클라이언트 1개당 SHA-1 1개만 허용하므로 **debug와 EAS는 별도 클라이언트 2개**로 만듭니다(패키지명은 `sports.master` 동일).
+
+> **모든 클라이언트는 같은 프로젝트에 있어야 합니다.** 프로젝트 번호로 확인하세요. Google AI Studio가 만든 `gen-lang-client-...` 프로젝트에 섞어 만들면 Android 로그인이 `DEVELOPER_ERROR`로 실패합니다.
+>
+> `패키지명 + SHA-1` 조합은 프로젝트 간 전역으로 유일합니다. 생성 시 "이미 사용 중" 에러가 나면 다른 클라이언트에 이미 등록돼 있다는 뜻이고, 그 상태로도 로그인은 동작합니다.
 
 ---
 
@@ -126,3 +148,6 @@ npx eas build --platform android --profile preview
 - **Expo Go는 쓰지 않습니다** — 이 프로젝트는 Sentry 등 커스텀 네이티브 모듈이 있어 dev-client 방식을 사용합니다.
 - **`.env`의 `SENTRY_DISABLE_AUTO_UPLOAD=true`는 지우지 마세요** — 없으면 로컬 빌드 시 Sentry 업로드 단계에서 실패합니다.
 - **`ios/`, `android/` 폴더는 손으로 하나씩 만들지 말고 항상 같이 재생성**하세요 (`npx expo prebuild --clean`) — 따로 생성하면 딥링크 scheme이 어긋날 수 있습니다.
+- **네이티브 의존성이나 `app.json` plugins를 건드렸으면 양쪽 플랫폼을 모두 재빌드**하세요. 한쪽만 설치하면 반대쪽에서 `TurboModuleRegistry.getEnforcing('...') could not be found`가 납니다.
+- **`pod install`이 `Encoding::CompatibilityError`로 죽으면 로케일 문제**입니다. `echo $LANG`이 비어 있으면 `LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 npx expo run:ios`로 실행하거나 `~/.zshrc`에 `export LANG=en_US.UTF-8`을 추가하세요. Terminal.app은 자동으로 넣어주지만 VSCode 통합 터미널은 그렇지 않습니다.
+- **`npx expo run:ios`를 동시에 두 번 실행하지 마세요** — 같은 빌드 디렉터리를 공유해 `xcodebuild error 65`로 실패합니다.
