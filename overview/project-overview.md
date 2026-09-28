@@ -1,7 +1,7 @@
 # 프로젝트 개요
 
 **최초 작성**: 2026-06-22  
-**최종 수정**: 2026-06-29
+**최종 수정**: 2026-09-29
 
 ---
 
@@ -31,13 +31,14 @@ sports-master/
 
 | 분류 | 기술 |
 |------|------|
-| 플랫폼 | React Native (Expo ~56) |
+| 플랫폼 | React Native (Expo ~57) |
 | 언어 | TypeScript |
 | 스타일 | NativeWind (Tailwind CSS) |
 | 상태관리 | Zustand (클라이언트), TanStack Query (서버) |
 | 네트워크 | Axios |
 | 타입 생성 | openapi-typescript (Swagger 자동 생성) |
 | 폼 | react-hook-form + zod |
+| 소셜 인증 | @react-native-google-signin/google-signin (구글), expo-apple-authentication (애플), expo-web-browser (카카오) |
 | 에러트래킹 | Sentry (@sentry/react-native) |
 | 패키지매니저 | pnpm |
 

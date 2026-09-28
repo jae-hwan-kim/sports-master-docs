@@ -1,17 +1,17 @@
 # Sports Master — 아키텍처 개요
 
-> 최종 정리: 2026-07-06 · 현재 상태 기준
+> 최종 정리: 2026-09-29 · 현재 상태 기준
 
 ![Sports Master 시스템 아키텍처](../../architecture.svg)
 
 ## 1. 시스템 구성
 
-Monorepo(단일 저장소, 프로젝트별 독립 패키지) 구조. 3개 프로젝트 + 로컬 DB 컨테이너.
+멀티레포 구조 — 3개 프로젝트가 각각 독립 git 레포이고, 로컬에서는 한 부모 디렉터리 아래 나란히 둔다([ADR 001](../adr/001-monorepo-vs-multirepo.md)). + 로컬 DB 컨테이너.
 
 | 계층 | 프로젝트 | 스택 | 상태 |
 |------|----------|------|------|
-| Client | `sports-master-web` | React Native, Expo, NativeWind, Zustand, TanStack Query, Axios, Zod | 스캐폴딩 (App.tsx 스텁, src 디렉터리만 존재) |
-| Server | `sports-master-api` | NestJS, TypeORM, Swagger, Winston, Helmet, Sentry | Entity + DTO 정의 단계 (Controller/Service 미구현) |
+| Client | `sports-master-web` | React Native, Expo, NativeWind, Zustand, TanStack Query, Axios, Zod | 명인 화면 전량 구현, 고객 탭/프로필/설정 작성 (홈·탐색은 스텁) |
+| Server | `sports-master-api` | NestJS, TypeORM, Swagger, Winston, Helmet, Sentry | 7개 모듈 가동 중 (고객 전용 모듈 미구현) |
 | Data | PostgreSQL 16 | Docker Compose, TypeORM | 로컬 컨테이너 |
 | Docs | `sports-master-docs` | Markdown (ADR, ERD, API 목록, 가이드) | 문서 전용 |
 
@@ -22,9 +22,9 @@ Monorepo(단일 저장소, 프로젝트별 독립 패키지) 구조. 3개 프로
 - **상태 관리**: Zustand (클라이언트 상태) + TanStack Query (서버 상태/캐싱).
 - **통신**: Axios → REST API.
 - **검증/폼**: Zod + react-hook-form (`@hookform/resolvers`).
-- **인증**: `jwt-decode` (JWT 파싱).
+- **인증**: `jwt-decode` (JWT 파싱) + 소셜 로그인 — 구글 `@react-native-google-signin/google-signin`(네이티브 SDK), 애플 `expo-apple-authentication`, 카카오 `expo-web-browser`(웹 OAuth 직접 구성).
 - **모니터링**: Sentry (`@sentry/react-native`).
-- **디렉터리**: `src/{api, store, screens, components, hooks, types, utils}` — 골격만 존재.
+- **디렉터리**: `src/{api, store, screens, components, hooks, navigation, types, utils, assets}`.
 
 ## 3. API (Server)
 
